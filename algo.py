@@ -8,15 +8,23 @@ import copy
 '''
 Input: A gridworld with initial grid, reward grid, problem/termination states (fake states), a discount lambda, and the number of iterations
 '''
-def value_iteration(v, reward_grid, fake_states, discount, iterations):
+def value_iteration(grid, reward_grid, fake_states, discount, iterations):
 	'''
 	Start from arbitrary end point, or all points
 	'''
+	v = copy.deepcopy(grid)
 	# first iteration
 	rows = np.shape(reward_grid)[0]
 	columns = np.shape(reward_grid)[1]
 	for i in range(iterations-1):
-		old_v = copy.deepcopy(v)
+		#old_v = copy.deepcopy(v)
+		#print(id(old_v[0][0]), id(v[0][0]))
+		old_v = [[0,]*columns for x in range(rows)]
+		for x in range(rows):
+			for y in range(columns):
+				old_v[x][y] = v[x][y]
+
+
 		print("Discount", (math.pow(discount, i)))
 		for x in range(rows):
 			for y in range(columns):
@@ -24,39 +32,47 @@ def value_iteration(v, reward_grid, fake_states, discount, iterations):
 				# try all combinations up down left right, protect boundaries
 				if (x, y) not in fake_states:
 					'''
-					up = 0.8*((grid_protection(reward_grid, x, y, x, y+1) + grid_protection(old_v, x, y, x, y+1)*(math.pow(discount, i))))
-					+ 0.1*((grid_protection(reward_grid, x, y, x+1, y) + grid_protection(old_v, x, y, x+1, y)*(math.pow(discount, i))))
-					+ 0.1*((grid_protection(reward_grid, x, y, x-1, y) + grid_protection(old_v, x, y, x-1, y)*(math.pow(discount, i))))
+					right = sum([0.8*((grid_protection(reward_grid, x, y, x, y+1) + grid_protection(old_v, x, y, x, y+1)*(math.pow(discount, i))))
+					, 0.1*((grid_protection(reward_grid, x, y, x+1, y) + grid_protection(old_v, x, y, x+1, y)*(math.pow(discount, i))))
+					, 0.1*((grid_protection(reward_grid, x, y, x-1, y) + grid_protection(old_v, x, y, x-1, y)*(math.pow(discount, i))))
+					])
+					left = sum([0.8*((grid_protection(reward_grid, x, y, x, y-1) + grid_protection(old_v, x, y, x, y-1)*(math.pow(discount, i))))
+					, 0.1*((grid_protection(reward_grid, x, y, x+1, y) + grid_protection(old_v, x, y, x+1, y)*(math.pow(discount, i)))) 
+					, 0.1*((grid_protection(reward_grid, x, y, x-1, y) + grid_protection(old_v, x, y, x-1, y)*(math.pow(discount, i))))
+					])
+					up = sum([0.8*((grid_protection(reward_grid, x, y, x-1, y) + grid_protection(old_v, x, y, x-1, y)*(math.pow(discount, i))))
+					, 0.1*((grid_protection(reward_grid, x, y, x, y+1) + grid_protection(old_v, x, y, x, y+1)*(math.pow(discount, i))))
+					, 0.1*((grid_protection(reward_grid, x, y, x, y-1) + grid_protection(old_v, x, y, x, y-1)*(math.pow(discount, i))))
+					])
+					down = sum([0.8*((grid_protection(reward_grid, x, y, x+1, y) + grid_protection(old_v, x, y, x+1, y)*(math.pow(discount, i)))) 
+					, 0.1*((grid_protection(reward_grid, x, y, x, y+1) + grid_protection(old_v, x, y, x, y+1)*(math.pow(discount, i))))
+					, 0.1*((grid_protection(reward_grid, x, y, x, y-1) + grid_protection(old_v, x, y, x, y-1)*(math.pow(discount, i))))
+					])
 					
-					down = 0.8*((grid_protection(reward_grid, x, y, x, y-1) + grid_protection(old_v, x, y, x, y-1)*(math.pow(discount, i))))
-					+ 0.1*((grid_protection(reward_grid, x, y, x+1, y) + grid_protection(old_v, x, y, x+1, y)*(math.pow(discount, i)))) 
-					+ 0.1*((grid_protection(reward_grid, x, y, x-1, y) + grid_protection(old_v, x, y, x-1, y)*(math.pow(discount, i))))
-					
-					left = 0.8*((grid_protection(reward_grid, x, y, x-1, y) + grid_protection(old_v, x, y, x-1, y)*(math.pow(discount, i))))
-					+ 0.1*((grid_protection(reward_grid, x, y, x, y+1) + grid_protection(old_v, x, y, x, y+1)*(math.pow(discount, i))))
-					+ 0.1*((grid_protection(reward_grid, x, y, x, y-1) + grid_protection(old_v, x, y, x, y-1)*(math.pow(discount, i))))
-					
-					right = 0.8*((grid_protection(reward_grid, x, y, x+1, y) + grid_protection(old_v, x, y, x+1, y)*(math.pow(discount, i)))) 
-					+ 0.1*((grid_protection(reward_grid, x, y, x, y+1) + grid_protection(old_v, x, y, x, y+1)*(math.pow(discount, i))))
-					+ 0.1*((grid_protection(reward_grid, x, y, x, y-1) + grid_protection(old_v, x, y, x, y-1)*(math.pow(discount, i))))
 					'''
-					up = 0.8*((grid_protection(reward_grid, x, y, x, y+1) + grid_protection(old_v, x, y, x, y+1)*(math.pow(discount, i))))
-					+ 0.1*((grid_protection(reward_grid, x, y, x+1, y) + grid_protection(old_v, x, y, x+1, y)*(math.pow(discount, i))))
-					+ 0.1*((grid_protection(reward_grid, x, y, x-1, y) + grid_protection(old_v, x, y, x-1, y)*(math.pow(discount, i))))
+					right = sum([0.8*(grid_protection(old_v, x, y, x, y+1))
+					, 0.1*(grid_protection(old_v, x, y, x+1, y))
+					, 0.1*(grid_protection(old_v, x, y, x-1, y))
+					])
 					
-					down = 0.8*((grid_protection(reward_grid, x, y, x, y-1) + grid_protection(old_v, x, y, x, y-1)*(math.pow(discount, i))))
-					+ 0.1*((grid_protection(reward_grid, x, y, x+1, y) + grid_protection(old_v, x, y, x+1, y)*(math.pow(discount, i)))) 
-					+ 0.1*((grid_protection(reward_grid, x, y, x-1, y) + grid_protection(old_v, x, y, x-1, y)*(math.pow(discount, i))))
+					left = sum([0.8*(grid_protection(old_v, x, y, x, y-1))
+					, 0.1*(grid_protection(old_v, x, y, x+1, y))
+					, 0.1*(grid_protection(old_v, x, y, x-1, y))
+					])
 					
-					left = 0.8*((grid_protection(reward_grid, x, y, x-1, y) + grid_protection(old_v, x, y, x-1, y)*(math.pow(discount, i))))
-					+ 0.1*((grid_protection(reward_grid, x, y, x, y+1) + grid_protection(old_v, x, y, x, y+1)*(math.pow(discount, i))))
-					+ 0.1*((grid_protection(reward_grid, x, y, x, y-1) + grid_protection(old_v, x, y, x, y-1)*(math.pow(discount, i))))
+					up = sum([0.8*(grid_protection(old_v, x, y, x-1, y))
+					, 0.1*(grid_protection(old_v, x, y, x, y+1))
+					, 0.1*(grid_protection(old_v, x, y, x, y-1))
+					])
+
+					down = sum([0.8*(grid_protection(old_v, x, y, x+1, y)) 
+					, 0.1*(grid_protection(old_v, x, y, x, y+1))
+					, 0.1*(grid_protection(old_v, x, y, x, y-1))
+					])
 					
-					right = 0.8*((grid_protection(reward_grid, x, y, x+1, y) + grid_protection(old_v, x, y, x+1, y)*(math.pow(discount, i)))) 
-					+ 0.1*((grid_protection(reward_grid, x, y, x, y+1) + grid_protection(old_v, x, y, x, y+1)*(math.pow(discount, i))))
-					+ 0.1*((grid_protection(reward_grid, x, y, x, y-1) + grid_protection(old_v, x, y, x, y-1)*(math.pow(discount, i))))
-					
-					v[x][y] = max([up, down, left, right])
+					v[x][y] = reward_grid[x][y] + math.pow(discount, i)*max([up, down, left, right])
+				else:
+					v[x][y] = reward_grid[x][y]
 				print(v[x][y], " ", end="")
 			print()
 		print()
@@ -85,6 +101,7 @@ reward_grid = [
 				]
 
 fake_states = [(0, 3), (1, 3), (1, 1)]
+
 
 value_iteration(grid, reward_grid, fake_states, 0.9, 10)
 
