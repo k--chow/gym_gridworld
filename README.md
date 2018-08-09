@@ -1,3 +1,4 @@
+
 ## GridWorld Gym Environment
 **********
 
@@ -33,11 +34,13 @@ This is a 3 x 4 grid.
 Gridworld has a rock which is an invalid state, and two exit/game ending states (red and green), which return reward -1 and 1 respectively. MDP's are special because an intentional action is not deterministic; If we choose to go north (action 0), there is a 0.7 probability we go north, and a 0.15 probability we go in each orthogonal direction (0.15 east, 0.15 west).
 
 ### Challenge: Algorithms to implement
-[] Policy Evaluation
-[] TD Learning
-[] Monte Carlo
-[] Value Iteration
-[] Policy Iteration
-
+- [ ] Policy Evaluation
+- [ ] TD Learning
+- [ ] Monte Carlo
+- [ ] Value Iteration
+- [ ] Policy Iteration
+- [ ] Q-learning
+- [ ] Proximal Policy
+- [ ] Policy Gradient
 ### TODO
 [x] Add visual rendering
