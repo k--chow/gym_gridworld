@@ -31,7 +31,7 @@ action = 3 # move west
 This is a 3 x 4 grid.
 
 ###
-Gridworld has a rock which is an invalid state, and two exit/game ending states (red and green), which return reward -1 and 1 respectively. MDP's are special because an intentional action is not deterministic; If we choose to go north (action 0), there is a 0.7 probability we go north, and a 0.15 probability we go in each orthogonal direction (0.15 east, 0.15 west).
+Gridworld has a rock which is an invalid state, and two exit/game ending states (red and green), which return reward -1 and 1 respectively. MDP's are special because every intentional action is not deterministic; If we choose to go north (action 0), there is a 0.8 probability we go north, and a 0.1 probability we go in each orthogonal direction (0.1 east, 0.1 west).
 
 ### Challenge: Algorithms to implement
 - [ ] Policy Evaluation

@@ -13,36 +13,38 @@ class GridWorldEnv(gym.Env):
 
   def __init__(self):
     self.action_space = spaces.Discrete(4)
-    self.observation_space = spaces.Tuple((spaces.Discrete(4), spaces.Discrete(3)))
+    self.observation_space = spaces.Tuple((spaces.Discrete(3), spaces.Discrete(4)))
     self.states = None
-    self.rewards = [[0, 0, 0, 0],[0, 0, 0, -1],[0, 0, 0, 1]]
+    self.rewards = [[0, 0, 0, 1],
+                    [0, 0, 0, -1],
+                    [0, 0, 0, 0]]
     self.seed()
-    self.max_y = 2
-    self.max_x = 3
+    self.max_r = 2
+    self.max_c = 3
     self.viewer = None
     self.rock = (1, 1)
   # invalid = -1, north = 0, east = 1, south = 2, west = 3
   def check_valid_step(self, action):
-    x, y = self.state
-    if action == 0 and y == self.max_y:
+    r, c = self.state
+    if action == 0 and r == 0:
       return -1 
-    if action == 1 and x == self.max_x:
+    if action == 1 and c == self.max_c:
       return -1
-    if action == 2 and y == 0:
+    if action == 2 and r == self.max_r:
       return -1
-    if action == 3 and x == 0:
+    if action == 3 and c == 0:
       return -1
     return action
 
   def step(self, action):
     done = 0
     coinflip = random.random()
-    x, y = self.state
-    new_x, new_y = None, None
+    r, c = self.state
+    new_r, new_c = None, None
     right_angle = 0
-    if coinflip < 0.15:
+    if coinflip < 0.1:
       right_angle = 1
-    if coinflip > 0.85:
+    if coinflip > 0.9:
       right_angle = 2
     # rotate action 90 degrees left or right
     if right_angle == 1:
@@ -52,48 +54,49 @@ class GridWorldEnv(gym.Env):
     # check if action is legal again
     action = self.check_valid_step(action)
     if action == -1:
-      new_x = x
-      new_y = y
+      new_r = r
+      new_c = c
     elif action == 0:
-      new_x = x
-      new_y = y+1
+      new_r = r-1
+      new_c = c
     elif action == 1:
-      new_x = x +1
-      new_y = y
+      new_r = r
+      new_c = c+1
     elif action == 2:
-      new_x = x
-      new_y = y-1
+      new_r = r+1
+      new_c = c
     else:
-      new_x = x-1
-      new_y = y
+      new_r = r
+      new_c = c-1
     
     # check if rock
-    if (new_x, new_y) == self.rock:
-        new_x = x
-        new_y = y
+    if (new_r, new_c) == self.rock:
+        new_r = r
+        new_c = c
 
-    if (new_x, new_y) == (3, 1) or (new_x, new_y) == (3, 2):
+    if (new_r, new_c) == (0, 3) or (new_r, new_c) == (1, 3):
     	done = 1
-    self.state = (new_x, new_y)
-    reward = self.rewards[self.state[1]][self.state[0]]
+    self.state = (new_r, new_c)
+    reward = self.rewards[new_r][new_c]
     return self.state, reward, done, action
 
   def reset(self):
-    self.state = (3,0)
-    return np.array(self.state)
+    self.state = (2,3)
+    return self.state
 
   def render(self, mode='human'):
-    x, y = self.state
+    r, c = self.state
     screen_width = 400
     screen_height = 300
     robot_height = 20
     robot_width = 10
     offset = 50
-    grid_center_x = (x+1)*100 - offset
-    grid_center_y = (y+1)*100 - offset
+    # starts from bottom left (instead of top left)
+    grid_center_x = (c+1)*100 - offset
+    grid_center_y = (self.max_r - r+1)*100 - offset
     if self.viewer is None:
         self.viewer = rendering.Viewer(screen_width, screen_height)
-        rock = rendering.FilledPolygon([(1*100, 1*100), (1*100, 2*100), (2*100, 2*100), (2*100, 1*100)])
+        rock = rendering.FilledPolygon([(1*100, 1*100), (2*100, 1*100), (2*100, 2*100), (1*100, 2*100)])
         rock.set_color(.8,.6,.4)
         green = rendering.FilledPolygon([(3*100, 1*100), (3*100, 2*100), (4*100, 2*100), (4*100, 1*100)])
         green.set_color(0,1,0)
